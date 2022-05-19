@@ -1,5 +1,3 @@
-![Clojure Logo](https://spin.atomicobject.com/wp-content/uploads/Clojure-Logo.png)
+![Clojure Logo](https://clojure.org/images/clojure-logo-120b.png)
 
-# Clojure Kindergarten
-
-A clojure playground
+Let's have fun with Clojure
