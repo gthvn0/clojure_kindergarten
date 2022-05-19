@@ -60,43 +60,38 @@
 ;;  - ticket is 15 euros
 ;;  - fraction of what we paid for the previous ticket is 0.9
 
+;; We can create a function that will help us to test outputs
+(def test1
+  (fn [t]
+    [(cost_systemA 15 t)
+     (cost_systemB 500 15 0.9 t)
+     (compare_A_B 500 15 0.9 t)]))
+
 ;; Let's start with 30
-(def t1 30)
-(cost_systemA 15 t1)
-(cost_systemB 500 15 0.9 t1)
-(compare_A_B 500 15 0.9 t1) ;; -179 euros... really need to go more times...
+(test1 30)
+;; -179 euros... really need to go more times...
 
 ;; 40 times
-(def t2 40)
-(cost_systemA 15 t2)
-(cost_systemB 500 15 0.9 t2)
-(compare_A_B 500 15 0.9 t2) ;; -33 so we need to go more times to cinema
+(test1 40)
+;; -33 euros... really need to go more times...
 
 ;; 50 times
-(def t3 50)
-(cost_systemA 15 t3)
-(cost_systemB 500 15 0.9 t3)
-(compare_A_B 500 15 0.9 t3) ;; +115 ok so less is ok
+(test1 50)
+;; +115 ok so less is ok
 
 ;; 45 times
-(def t4 45)
-(cost_systemA 15 t4)
-(cost_systemB 500 15 0.9 t4)
-(compare_A_B 500 15 0.9 t4) ;; +41 ok still less
+(test1 45)
+;; +41 ok still less
 
 ;; 42 times
-(def t5 42)
-(cost_systemA 15 t5)
-(cost_systemB 500 15 0.9 t5)
-(compare_A_B 500 15 0.9 t5) ;; -3 so we probably need to go 43 times if we want
-                            ;; the card be profitable... let's check that
+(test1 42)
+;; -3 so we probably need to go 43 times if we want
+;; the card be profitable... let's check that
 
 ;; 43 times
-(def t6 43)
-(cost_systemA 15 t6)
-(cost_systemB 500 15 0.9 t6)
-(compare_A_B 500 15 0.9 t6) ;; +11 ok we've got it. After 43 times the card is
-                            ;; profitable
+(test1 43)
+;; +11 ok we've got it. After 43 times the card is
+;; profitable
 
 ;; Let's do this automatically now
 (defn card_is_profitable
