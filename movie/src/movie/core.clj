@@ -16,28 +16,31 @@
 ;; Iter 2, A (Iter 1 + ticket_price), B (Iter 1 + ticket_price_iter_1 * 0.9)
 ;; Iter 3, A (Iter 2 + ticket_price), B (Iter 2 + ticket_price_iter_2 * 0.9)
 
-(defn movie_iter
+(defn movie
   "Return the number of times we need to go to cinema from which a card is
   profitable"
   [card ticket perc]
   (loop [
-         iter 0
-         ticket_priceB (* ticket perc)
+         iter 1
          systemA ticket
-         systemB (+ card ticket_priceB)]
+         systemB (+ card (* ticket perc))]
     (if (< (Math/ceil systemB) systemA)
-      iter
+      (do
+        (println (str "card " card " .. ticket " ticket " .. perc " perc))
+        (println (str "iter " iter " .. A: " systemA " .. B: " systemB))
+        iter)
       (recur
-        (+ iter 1)
-        (* ticket_priceB perc)
+        (inc iter)
         (+ systemA ticket)
-        (+ systemB ticket_priceB)))))
+        (+ systemB (* ticket (Math/pow perc (inc iter))))))))
 
-(movie_iter 500  15  0.9) ;; should return 43
-                     ;; (with card the total price is 634, with tickets 645)
-(movie_iter 100  10  0.95) ;; should return 24
-                      ;; (with card the total price is 235, with tickets 240)
+(movie 0 10 0.95)
+;; If I go once:
+;;   - systemA => 10
+;;   - systemB => 0 + 10 * 0.95 = 9.5
+;; Ceil systemB => 10 so not good. We need one more iteration
 
+(movie 100 10 0.95) ;; should return 24
 
 (defn -main
   "I don't do a whole lot ... yet."
