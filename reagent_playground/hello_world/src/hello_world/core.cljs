@@ -14,10 +14,20 @@
 (defn get-app-element []
   (gdom/getElement "app"))
 
+(defn simple-component
+  []
+  [:div]
+   [:p "I am a component"]
+   [:p.someclass
+    "I have " [:strong "bold"]
+    [:span {:style {:color "red"}} " and red "] "text."])
+
 (defn hello-world []
   [:div
    [:h1 (:text @app-state)]
-   [:h3 "Edit this in src/hello_world/core.cljs and watch it change!"]])
+   [:h3 "Edit this in src/hello_world/core.cljs and watch it change!"]
+   [:p "I include simple-component."]
+   [simple-component]])
 
 (defn mount [el]
   (rdom/render [hello-world] el))
