@@ -9,7 +9,7 @@
 (defn multiply [a b] (* a b))
 
 ;; define your app data so that it doesn't get over-written on reload
-(defonce app-state (atom {:text "Hello world!"}))
+(defonce app-state (atom {:text "Hello World App"}))
 
 (defn get-app-element []
   (gdom/getElement "app"))
@@ -22,10 +22,16 @@
     "I have " [:strong "bold"]
     [:span {:style {:color "red"}} " and red "] "text."])
 
+(defn hello-component
+  "Take a name and say a polite hello"
+  [name]
+  [:p "Hello, " name])
+
 (defn hello-world []
   [:div
    [:h1 (:text @app-state)]
-   [:h3 "Edit this in src/hello_world/core.cljs and watch it change!"]
+   [hello-component "tout le monde"]
+   [:hr]
    [:p "I include simple-component."]
    [simple-component]])
 
