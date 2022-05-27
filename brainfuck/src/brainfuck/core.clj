@@ -76,8 +76,8 @@
       (recur nested (inc cur)))))
 
 (defn new_vm
-  [cells dp ct]
-  {:cells cells, :dp dp, :ct ct})
+  [cells dp ct out]
+  {:cells cells, :dp dp, :ct ct, :out out})
 
 (defn bf_update_vm
   "Returned the vm_state updated after consuming first token.
@@ -89,40 +89,50 @@
   [vm tokens]
   (let [token_read (nth tokens (vm :ct))]
     (case token_read
-      :next (new_vm (vm :cells) (inc (vm :dp)) (inc (vm :ct)))
-      :prev (new_vm (vm :cells) (dec (vm :dp)) (inc (vm :ct)))
+      :next (new_vm (vm :cells) (inc (vm :dp)) (inc (vm :ct)) (vm :out))
+      :prev (new_vm (vm :cells) (dec (vm :dp)) (inc (vm :ct)) (vm :out))
       :inc  (new_vm
               (assoc (vm :cells) (vm :dp) (inc (get (vm :cells) (vm :dp))))
               (vm :dp)
-              (inc (vm :ct)))
+              (inc (vm :ct))
+              (vm :out))
       :dec  (new_vm
               (assoc (vm :cells) (vm :dp) (dec (get (vm :cells) (vm :dp))))
               (vm :dp)
-              (inc (vm :ct)))
+              (inc (vm :ct))
+              (vm :out))
       :in   nil
       :out (do
-             (print (char (get (vm :cells) (vm :dp))))
-             (new_vm (vm :cells) (vm :dp) (inc (vm :ct))))
+             (new_vm
+               (vm :cells)
+               (vm :dp)
+               (inc (vm :ct))
+               (str (vm :out) (char (get (vm :cells) (vm :dp))))))
       :begin (let [new_cp (if (= 0 (get (vm :cells) (vm :dp)))
                             (find_end_loop tokens (vm :ct))
                             (inc (vm :ct)))]
-               (new_vm (vm :cells) (vm :dp) new_cp))
+               (new_vm (vm :cells) (vm :dp) new_cp (vm :out)))
       :end (let [new_cp (if (= 0 (get (vm :cells) (vm :dp)))
                           (inc (vm :ct))
                           (find_begin_loop tokens (vm :ct)))]
-             (new_vm (vm :cells) (vm :dp) new_cp)))))
+             (new_vm (vm :cells) (vm :dp) new_cp (vm :out))))))
 
-(defn bf_run
+(defn bf_exec
   "Take a list of BF tokens and run them"
   [tokens]
   (loop [vm {:cells (vec (repeat 20 0)) ;; Cells are not dynamic
              :dp 0   ;; data pointer
-             :ct 0}] ;; program counter
-    (when (< (vm :ct) (count tokens))
-      (recur (bf_update_vm vm tokens)))))
+             :ct 0   ;; program counter
+             :out ""}]
+    (if (< (vm :ct) (count tokens))
+      (recur (bf_update_vm vm tokens))
+      (vm :out))))
+
+(defn bf_run
+  [bf_code]
+  (bf_exec (bf_parser bf_code)))
 
 (defn -main
   "Run BF code"
   [code]
-  (bf_run (bf_parser code))
-  (println))
+  (println (bf_run code)))
