@@ -79,6 +79,11 @@
   [cells dp ct out]
   {:cells cells, :dp dp, :ct ct, :out out})
 
+(defn get_data
+  "Return current data from a VM"
+  [vm]
+  (get (vm :cells) (vm :dp)))
+
 (defn bf_update_vm
   "Returned the vm_state updated after consuming first token.
    Our state is reprensented by:
@@ -92,27 +97,26 @@
       :next (new_vm (vm :cells) (inc (vm :dp)) (inc (vm :ct)) (vm :out))
       :prev (new_vm (vm :cells) (dec (vm :dp)) (inc (vm :ct)) (vm :out))
       :inc  (new_vm
-              (assoc (vm :cells) (vm :dp) (inc (get (vm :cells) (vm :dp))))
+              (assoc (vm :cells) (vm :dp) (inc (get_data vm)))
               (vm :dp)
               (inc (vm :ct))
               (vm :out))
       :dec  (new_vm
-              (assoc (vm :cells) (vm :dp) (dec (get (vm :cells) (vm :dp))))
+              (assoc (vm :cells) (vm :dp) (dec (get_data vm)))
               (vm :dp)
               (inc (vm :ct))
               (vm :out))
       :in   nil
-      :out (do
-             (new_vm
-               (vm :cells)
-               (vm :dp)
-               (inc (vm :ct))
-               (str (vm :out) (char (get (vm :cells) (vm :dp))))))
-      :begin (let [new_cp (if (= 0 (get (vm :cells) (vm :dp)))
+      :out  (new_vm
+              (vm :cells)
+              (vm :dp)
+              (inc (vm :ct))
+              (str (vm :out) (char (get_data vm))))
+      :begin (let [new_cp (if (= 0 (get_data vm))
                             (find_end_loop tokens (vm :ct))
                             (inc (vm :ct)))]
                (new_vm (vm :cells) (vm :dp) new_cp (vm :out)))
-      :end (let [new_cp (if (= 0 (get (vm :cells) (vm :dp)))
+      :end (let [new_cp (if (= 0 (get_data vm))
                           (inc (vm :ct))
                           (find_begin_loop tokens (vm :ct)))]
              (new_vm (vm :cells) (vm :dp) new_cp (vm :out))))))
