@@ -1,7 +1,12 @@
 (ns ball.core-test
-  (:require [clojure.test :refer :all]
-            [ball.core :refer :all]))
+  (:require [clojure.test :refer [deftest is testing]]
+            [ball.core :refer [max-ball]]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+(deftest a-test1
+  (testing "max-ball"
+     (is (= (max-ball 37), 10))
+     (is (= (max-ball 45), 13))
+     (is (= (max-ball 99), 28))
+     (is (= (max-ball 85), 24))
+     
+)) 
