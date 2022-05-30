@@ -1,18 +1,16 @@
 (ns sq-in-rect.core
   (:gen-class))
 
-(defn sq-in-rect
-  [lng wdth]
-  (loop [longueur lng
-         largeur wdth
-         result []]
-    (if (some zero? (list longueur largeur))
-      ;; 5 5 return nil. So when there is only one square we returned nil
-      (when (> (count result) 2)
-        result)
-      (if (< longueur largeur)
-        (recur longueur (- largeur longueur) (conj result longueur))
-        (recur (- longueur largeur) largeur (conj result largeur))))))
+(defn sq-in-rect [lng wdth]
+  (when (not= lng wdth)
+    (loop [longueur lng, largeur wdth, result []]
+      (if (some zero? (list longueur largeur))
+        result
+        (if (< longueur largeur)
+          ;; 3 5
+          (recur longueur (- largeur longueur) (conj result longueur))
+          ;; 5 3
+          (recur (- longueur largeur) largeur (conj result largeur)))))))
 
 (defn -main
   "I don't do a whole lot ... yet."
