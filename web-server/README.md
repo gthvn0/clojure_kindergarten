@@ -9,11 +9,16 @@ the server part and compojure for the routing.
 ```
 web-server.core=> (require '[web-server.core :as w])
 nil
-web-server.core=> (def server (w/new-server))
+web-server.core=> (w/start-server 8080)
 #'web-server.core/server
 ```
 - And you can do: `curl http://localhost:8080`
-- You should see: **Welcome to my new server**
+- You should see the web page
+- To stop the server in the repl just do
+```
+web-server.core=> (w/stop-server)
+nil
+```
 
 ## License
 
