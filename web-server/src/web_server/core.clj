@@ -1,17 +1,20 @@
 (ns web-server.core
   (:require [org.httpkit.server :as s]
             [compojure.core :refer [GET routes]]
-            [compojure.route :as r]))
+            [compojure.route :as r]
+            [ring.util.response :refer [resource-response]]
+            ))
 
 (defonce server (atom nil))
 
 (defn app
   []
   (routes
-    (GET "/" [req]
+    (GET "/" []
          {:status 200
           :headers {"Content-Type" "text/html"}
           :body "<h1>Welcome</h1>"})
+    (GET "/inside" [] (resource-response "index.html" {:root "public"}))
     (r/not-found "<h1>Not found</h1>")))
 
 (defn start-server
