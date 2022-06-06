@@ -1,10 +1,19 @@
 # web-server
 
-A Clojure library designed to ... well, that part is up to you.
+A Clojure library designed to serve request on the web. I'm using http-kit for
+the server part and compojure for the routing.
 
 ## Usage
 
-FIXME
+- Currently I'm only testing it using the repl. In the repl:
+```
+web-server.core=> (require '[web-server.core :as w])
+nil
+web-server.core=> (def server (w/new-server))
+#'web-server.core/server
+```
+- And you can do: `curl http://localhost:8080`
+- You should see: **Welcome to my new server**
 
 ## License
 
