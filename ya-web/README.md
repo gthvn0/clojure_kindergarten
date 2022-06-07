@@ -1,4 +1,4 @@
-# web-server
+# ya-web
 
 A Clojure library designed to serve request on the web. I'm using http-kit for
 the server part and compojure for the routing.
@@ -7,16 +7,16 @@ the server part and compojure for the routing.
 
 - Currently I'm only testing it using the repl. In the repl:
 ```
-web-server.core=> (require '[web-server.core :as w])
+ya-web.core=> (require '[ya-web.core :as w])
 nil
-web-server.core=> (w/start-server 8080)
-#'web-server.core/server
+ya-web.core=> (w/start-server 8080)
+#'ya-web.core/server
 ```
 - And you can do: `curl http://localhost:8080`
 - You should see the web page
 - To stop the server in the repl just do
 ```
-web-server.core=> (w/stop-server)
+ya-web.core=> (w/stop-server)
 nil
 ```
 

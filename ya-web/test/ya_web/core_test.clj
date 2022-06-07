@@ -1,6 +1,6 @@
-(ns web-server.core-test
+(ns ya-web.core-test
   (:require [clojure.test :refer :all]
-            [web-server.core :refer :all]))
+            [ya-web.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."

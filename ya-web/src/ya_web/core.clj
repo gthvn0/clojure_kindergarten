@@ -1,4 +1,4 @@
-(ns web-server.core
+(ns ya-web.core
   (:require [org.httpkit.server :as s]
             [compojure.core :refer [GET routes]]
             [compojure.route :as r]
