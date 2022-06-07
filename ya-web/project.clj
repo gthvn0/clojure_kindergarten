@@ -6,4 +6,8 @@
   :dependencies [[org.clojure/clojure "1.10.3"]
                  [http-kit "2.5.3"]
                  [compojure "1.7.0"]]
+  :main ^:skip-aot ya-web.core
+  :target-path "target/%s"
+  :profiles {:uberjar {:aot :all
+                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}}
   :repl-options {:init-ns ya-web.core})
