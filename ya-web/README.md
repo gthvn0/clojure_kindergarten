@@ -5,20 +5,8 @@ the server part and compojure for the routing.
 
 ## Usage
 
-- Currently I'm only testing it using the repl. In the repl:
-```
-ya-web.core=> (require '[ya-web.core :as w])
-nil
-ya-web.core=> (w/start-server 8080)
-#'ya-web.core/server
-```
-- And you can do: `curl http://localhost:8080`
-- You should see the web page
-- To stop the server in the repl just do
-```
-ya-web.core=> (w/stop-server)
-nil
-```
+- Configure the port in *config.edn* (default is 8888)
+- And just use `lein run`
 
 ## License
 
