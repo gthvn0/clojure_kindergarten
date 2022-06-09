@@ -6,18 +6,20 @@
 
 (defn line->str
   [line]
-  (str " " (nth line 0) " | " (nth line 1) " | " (nth line 2)))
+  (str "| " (nth line 0) " | " (nth line 1) " | " (nth line 2) " |"))
 
 (defn print-board
   "Take a tic tac toe board that is an array of 9 index and
    display it has a 3x3 board (kind of)."
   [board]
   (let [b (partition 3 board)]
+    (println "+---+---+---+")
     (println (line->str (first b)))
-    (println "---+---+---")
+    (println "+---+---+---+")
     (println (line->str (second b)))
-    (println "---+---+---")
-    (println (line->str (last b)))))
+    (println "+---+---+---+")
+    (println (line->str (last b))))
+    (println "+---+---+---+"))
 
 (defn read-user-input
   "Read the user input and returns an integer or nil if not valid"
@@ -31,22 +33,22 @@
   "Check that a move is valid in the context of a tic tac toc
    grid. That means it must be in the range of the game but also
    not an already played spot."
-   [idx board]
+   [board idx]
    (and (some? idx) (integer? (get board (dec idx)))))
 
 (defn next-player
+  "Return the next player."
   [player]
-  (if (= player \X)
-    \O
-    \X))
+  (let [player_switch {:X :O :O :X}]
+    (player_switch player)))
 
-(defn play-move
+(defn player-move
   "Play the players move. You need to ensure that the move is valid.
    It returns the new board."
-  [player move board]
-  (assoc board (dec move) player))
+  [board player move]
+  (assoc board (dec move) (name player)))
 
-(defn game-one-turn
+(defn play-one-turn
   "Play one turn for a given player and board
     - Take the user input
     - check that it is valid
@@ -55,14 +57,14 @@
     Return the new board
    "
    [board player]
-   (println "It is your turn player " player ", where do you play? ")
+   (println "It is your turn player" (name player) ", where do you play?")
    (loop [move (read-user-input)]
-     (if-not (move-is-valid? move board)
+     (if-not (move-is-valid? board move)
        (do
          (println "Invalid move, pick number in the board... ")
          (print-board board)
          (recur (read-user-input)))
-       (play-move player move board))))
+       (player-move board player move))))
 
 (defn extract-moves
   "Return the list of index for a given player from a board
@@ -70,13 +72,18 @@
   [board player]
   (keys
     (filter
-      (fn [[_ v]] (= v player))
+      (fn [[_ v]] (= v (name player)))
       (zipmap init_board board))))
 
 (defn contains-winning-moves?
   [our_m win_m]
   (= (count our_m)
      (count (set (concat our_m win_m)))))
+
+(defn board-is-complete?
+  "Return true if there is no more moves."
+  [board]
+  (every? string? board))
 
 (defn board-is-winning?
   "Return true if the board is winning.
@@ -125,14 +132,17 @@
 (defn game-loop
   []
   (loop [board init_board
-         player \X]
+         player :X]
     (print-board board)
-    (let [new_board (game-one-turn board player)]
-      (if (board-is-winning? new_board player)
-        (do
-          (print-board new_board)
-          (println "YOU WON" player))
-        (recur new_board (next-player player))))))
+    (let [new_board (play-one-turn board player)]
+      (cond
+        (board-is-winning? new_board player) (do
+                                               (print-board new_board)
+                                               (println "Player" (name player) "won"))
+        (board-is-complete? new_board) (do
+                                         (print-board new_board)
+                                         (println "Board is complete without winner"))
+        :else (recur new_board (next-player player))))))
 
 (defn -main
   []
