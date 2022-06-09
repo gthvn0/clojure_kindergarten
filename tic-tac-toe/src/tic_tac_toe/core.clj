@@ -43,11 +43,35 @@
   (let [player_switch {:X :O :O :X}]
     (player_switch player)))
 
-(defn player-move
+(defn do-player-move
   "Play the players move. You need to ensure that the move is valid.
    It returns the new board."
   [board player move]
   (assoc board (dec move) (name player)))
+
+(defn human-play
+  "If human plays we need to ask her its move, check if it is valid and do the
+   move"
+  [board player]
+  (println "It is your turn player" (name player) ", where do you play?")
+  (loop [move (read-user-input)]
+    (if-not (move-is-valid? board move)
+      (do
+        (println "Invalid move, pick number in the board... ")
+        (print-board board)
+        (recur (read-user-input)))
+      (do-player-move board player move))))
+
+(defn machine-play
+  "As it is not implemented let's call human-play for now"
+  [board player]
+  (println "Machine should play but it is not yet implemented")
+  (human-play board player))
+
+(defn human?
+  "Return true if the player is human. For now :X is humain"
+  [player]
+  (= player :X))
 
 (defn play-one-turn
   "Play one turn for a given player and board
@@ -58,14 +82,9 @@
     Return the new board
    "
    [board player]
-   (println "It is your turn player" (name player) ", where do you play?")
-   (loop [move (read-user-input)]
-     (if-not (move-is-valid? board move)
-       (do
-         (println "Invalid move, pick number in the board... ")
-         (print-board board)
-         (recur (read-user-input)))
-       (player-move board player move))))
+   (if (human? player)
+     (human-play board player)
+     (machine-play board player)))
 
 (defn extract-moves
   "Return the list of index for a given player from a board
