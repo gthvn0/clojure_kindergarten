@@ -50,23 +50,34 @@
   (assoc board (dec move) (name player)))
 
 (defn human-play
-  "If human plays we need to ask her its move, check if it is valid and do the
-   move"
+  "Ask her its move, check if it is valid and do the move"
   [board player]
-  (println "It is your turn player" (name player) ", where do you play?")
+  (println "> It is your turn player" (name player) ", where do you play?")
   (loop [move (read-user-input)]
     (if-not (move-is-valid? board move)
       (do
-        (println "Invalid move, pick number in the board... ")
+        (println "> Invalid move, pick number in the board... ")
         (print-board board)
         (recur (read-user-input)))
       (do-player-move board player move))))
 
-(defn machine-play
-  "As it is not implemented let's call human-play for now"
+(defn first-empty
+  "Return the first empty room on the board
+   Example: [X 2 3 O 5 6 7 8 9] -> 2"
+  [board]
+  (first (filter integer? board)))
+
+(defn basic-ai
+  "Just peek the first empty place"
   [board player]
-  (println "Machine should play but it is not yet implemented")
-  (human-play board player))
+  (let [move (first-empty board)]
+    (println "> Machine chose" move)
+    (do-player-move board player move)))
+
+(defn machine-play
+  "Call one of the AI"
+  [board player]
+  (basic-ai board player))
 
 (defn human?
   "Return true if the player is human. For now :X is humain"
@@ -146,10 +157,10 @@
       (cond
         (board-is-winning? new_board player) (do
                                                (print-board new_board)
-                                               (println "Player" (name player) "won"))
+                                               (println "> Player" (name player) "won"))
         (board-is-complete? new_board) (do
                                          (print-board new_board)
-                                         (println "Board is complete without winner"))
+                                         (println "> Board is complete without winner"))
         :else (recur new_board (next-player player))))))
 
 (defn -main
