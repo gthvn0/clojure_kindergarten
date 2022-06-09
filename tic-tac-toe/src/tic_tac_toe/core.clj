@@ -83,24 +83,6 @@
         (recur (read-human-input)))
       (do-player-move board player move))))
 
-(defn human?
-  "Return true if the player is human. For now :X is humain"
-  [player]
-  (= player :X))
-
-(defn play-one-turn
-  "Play one turn for a given player and board
-    - Take the user input
-    - check that it is valid
-    - if yes play
-    - else ask again
-    Return the new board
-   "
-   [board player]
-   (if (human? player)
-     (human-play board player)
-     (machine-play board player)))
-
 ; -----------------------------------------------------------------------------
 ; Define when a board is winning
 
@@ -157,13 +139,31 @@
   (every? string? board))
 
 ; -----------------------------------------------------------------------------
-; Some functions used in the Main loop
+; Define functions to manage the game loop
 
 (defn next-player
   "Return the next player."
   [player]
   (let [player_switch {:X :O :O :X}]
     (player_switch player)))
+
+(defn human?
+  "Return true if the player is human. For now :X is humain"
+  [player]
+  (= player :X))
+
+(defn play-one-turn
+  "Play one turn for a given player and board
+    - Take the user input
+    - check that it is valid
+    - if yes play
+    - else ask again
+    Return the new board
+   "
+   [board player]
+   (if (human? player)
+     (human-play board player)
+     (machine-play board player)))
 
 ; -----------------------------------------------------------------------------
 ; Main loop
