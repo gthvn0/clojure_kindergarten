@@ -24,15 +24,6 @@
     (separator)))
 
 ; -----------------------------------------------------------------------------
-; Update the board with move from Machine or from Human
-
-(defn do-player-move
-  "Play the players move. You need to ensure that the move is valid befor
-   calling this function. It returns the new board."
-  [board player move]
-  (assoc board (dec move) (name player)))
-
-; -----------------------------------------------------------------------------
 ; Define AI move
 
 (defn first-empty
@@ -42,22 +33,23 @@
   (first (filter integer? board)))
 
 (defn basic-ai
-  "Just peek the first empty place"
-  [board player]
+  "Just peek the first empty place and return the move"
+  [board]
   (let [move (first-empty board)]
     (println "> Machine chose" move)
-    (do-player-move board player move)))
+    move))
 
 (defn machine-play
   "Call one of the AI"
-  [board player]
-  (basic-ai board player))
+  [board]
+  (basic-ai board))
 
 ; -----------------------------------------------------------------------------
 ; Define Human move
 
 (defn read-human-input
-  "Read the user input and returns an integer or nil if not valid"
+  "Read the user input and returns an integer or nil if not valid and if it
+   is valid returns its move"
   []
   (let [user_input (read-line)]
     (if (every? #(Character/isDigit %) user_input)
@@ -73,15 +65,14 @@
 
 (defn human-play
   "Ask her its move, check if it is valid and do the move"
-  [board player]
-  (println "> It is your turn player" (name player) ", where do you play?")
+  [board]
   (loop [move (read-human-input)]
     (if-not (move-is-valid? board move)
       (do
-        (println "> Invalid move, pick number in the board... ")
+        (println "> Invalid move, pick a free number in the board... ")
         (print-board board)
         (recur (read-human-input)))
-      (do-player-move board player move))))
+      move)))
 
 ; -----------------------------------------------------------------------------
 ; Define when a board is winning
@@ -152,6 +143,12 @@
   [player]
   (= player :X))
 
+(defn do-player-move
+  "Play the players move. You need to ensure that the move is valid befor
+   calling this function. It returns the new board."
+  [board player move]
+  (assoc board (dec move) (name player)))
+
 (defn play-one-turn
   "Play one turn for a given player and board
     - Take the user input
@@ -162,8 +159,10 @@
    "
    [board player]
    (if (human? player)
-     (human-play board player)
-     (machine-play board player)))
+     (do
+       (println "> It is your turn player" (name player) ", where do you play?")
+       (do-player-move board player (human-play board)))
+     (do-player-move board player (machine-play board))))
 
 ; -----------------------------------------------------------------------------
 ; Main loop
