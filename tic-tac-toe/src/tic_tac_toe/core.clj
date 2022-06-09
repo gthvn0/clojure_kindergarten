@@ -12,14 +12,15 @@
   "Take a tic tac toe board that is an array of 9 index and
    display it has a 3x3 board (kind of)."
   [board]
-  (let [b (partition 3 board)]
-    (println "+---+---+---+")
+  (let [b (partition 3 board)
+        separator #(println "+---+---+---+")]
+    (separator)
     (println (line->str (first b)))
-    (println "+---+---+---+")
+    (separator)
     (println (line->str (second b)))
-    (println "+---+---+---+")
-    (println (line->str (last b))))
-    (println "+---+---+---+"))
+    (separator)
+    (println (line->str (last b)))
+    (separator)))
 
 (defn read-user-input
   "Read the user input and returns an integer or nil if not valid"
