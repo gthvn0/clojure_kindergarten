@@ -1,8 +1,9 @@
 (ns tic-tac-toe.core
   (:gen-class))
 
-; Constants
-(def init_board [1 2 3 4 5 6 7 8 9])
+
+; -----------------------------------------------------------------------------
+; Define the display of a board.
 
 (defn line->str
   [line]
@@ -22,44 +23,17 @@
     (println (line->str (last b)))
     (separator)))
 
-(defn read-user-input
-  "Read the user input and returns an integer or nil if not valid"
-  []
-  (let [user_input (read-line)]
-    (if (every? #(Character/isDigit %) user_input)
-      (Integer/parseInt user_input)
-      nil)))
-
-(defn move-is-valid?
-  "Check that a move is valid in the context of a tic tac toc
-   grid. That means it must be in the range of the game but also
-   not an already played spot."
-   [board idx]
-   (and (some? idx) (integer? (get board (dec idx)))))
-
-(defn next-player
-  "Return the next player."
-  [player]
-  (let [player_switch {:X :O :O :X}]
-    (player_switch player)))
+; -----------------------------------------------------------------------------
+; Update the board with move from Machine or from Human
 
 (defn do-player-move
-  "Play the players move. You need to ensure that the move is valid.
-   It returns the new board."
+  "Play the players move. You need to ensure that the move is valid befor
+   calling this function. It returns the new board."
   [board player move]
   (assoc board (dec move) (name player)))
 
-(defn human-play
-  "Ask her its move, check if it is valid and do the move"
-  [board player]
-  (println "> It is your turn player" (name player) ", where do you play?")
-  (loop [move (read-user-input)]
-    (if-not (move-is-valid? board move)
-      (do
-        (println "> Invalid move, pick number in the board... ")
-        (print-board board)
-        (recur (read-user-input)))
-      (do-player-move board player move))))
+; -----------------------------------------------------------------------------
+; Define AI move
 
 (defn first-empty
   "Return the first empty room on the board
@@ -79,6 +53,36 @@
   [board player]
   (basic-ai board player))
 
+; -----------------------------------------------------------------------------
+; Define Human move
+
+(defn read-human-input
+  "Read the user input and returns an integer or nil if not valid"
+  []
+  (let [user_input (read-line)]
+    (if (every? #(Character/isDigit %) user_input)
+      (Integer/parseInt user_input)
+      nil)))
+
+(defn move-is-valid?
+  "Check that a move is valid in the context of a tic tac toc
+   grid. That means it must be in the range of the game but also
+   not an already played spot."
+   [board idx]
+   (and (some? idx) (integer? (get board (dec idx)))))
+
+(defn human-play
+  "Ask her its move, check if it is valid and do the move"
+  [board player]
+  (println "> It is your turn player" (name player) ", where do you play?")
+  (loop [move (read-human-input)]
+    (if-not (move-is-valid? board move)
+      (do
+        (println "> Invalid move, pick number in the board... ")
+        (print-board board)
+        (recur (read-human-input)))
+      (do-player-move board player move))))
+
 (defn human?
   "Return true if the player is human. For now :X is humain"
   [player]
@@ -97,67 +101,83 @@
      (human-play board player)
      (machine-play board player)))
 
-(defn extract-moves
-  "Return the list of index for a given player from a board
-   Example: [X X 3 O O 6 7 8 9] X -> (1 2)"
-  [board player]
-  (keys
-    (filter
-      (fn [[_ v]] (= v (name player)))
-      (zipmap init_board board))))
+; -----------------------------------------------------------------------------
+; Define when a board is winning
 
-(defn contains-winning-moves?
-  [our_m win_m]
-  (= (count our_m)
-     (count (set (concat our_m win_m)))))
+; get-vlines, get-hlines and get-diags are used to check if a board is winning.
+; To win a player need to fill one of this eight lines so we can extract them
+; from a board to check that if there is only X or O.
+
+(defn get-vlines
+  "Return vertical lines"
+  [board]
+  (let [part (partition 3 board)]
+    (list
+    (for [x part :let [y (first x)]] y)
+    (for [x part :let [y (second x)]] y)
+    (for [x part :let [y (last x)]] y))))
+
+(defn get-hlines
+  "Return horizontal-lines"
+  [board]
+  (partition 3 board))
+
+(defn get-diags
+  "Return diagonals"
+  [board]
+  (list
+    (list (nth board 0) (nth board 4) (nth board 8))
+    (list (nth board 2) (nth board 4) (nth board 6))))
+
+(defn get-winning-lines
+  "Return a list of all winning lines"
+  [board]
+  (concat
+    (get-vlines board)
+    (get-hlines board)
+    (get-diags board)))
+
+(defn line-is-winning?
+  "Take a line and check if it is winning. It is winning if all items are the
+   same X X X or O O O."
+  [line]
+  (= 1 (count (set line))))
 
 (defn board-is-winning?
-  "Return true if the board is winning.
-   It is winning if X or O are like:
-      -> Horizontal winning
-         1 2 3     4 5 6     7 8 9
-         X X X     . . .     . . .
-         . . .     X X X     . . .
-         . . .     . . .     X X X
-
-      -> Vertical winning
-         1 4 7     2 5 8     3 6 9
-         X . .     . X .     . . X
-         X . .     . X .     . . X
-         X . .     . X .     . . X
-
-      -> Diagonal winning
-         1 5 9     3 5 7
-         X . .     . . X
-         . X .     . X .
-         . . X     X . .
-
-  So we win if our moves is part of ones of this 8 winning values.
-  "
-  [board player]
-  (let [win_moves '((1 2 3) (4 5 6) (7 8 9)
-                    (1 4 7) (2 5 8) (3 6 9)
-                    (1 5 9) (3 5 7))
-        moves (extract-moves board player)]
-   (some #(contains-winning-moves? moves %) win_moves)))
+  "A board is winning if one of all its winning lines is full of X or O"
+  [board]
+  (let [win_lines (get-winning-lines board)]
+    (if (some line-is-winning? win_lines)
+      true
+      false)))
 
 (defn board-is-complete?
   "Return true if there is no more moves."
   [board]
   (every? string? board))
 
-; ---------------------------
+; -----------------------------------------------------------------------------
+; Some functions used in the Main loop
+
+(defn next-player
+  "Return the next player."
+  [player]
+  (let [player_switch {:X :O :O :X}]
+    (player_switch player)))
+
+; -----------------------------------------------------------------------------
 ; Main loop
+
 (defn game-loop
   []
-  (loop [board init_board
+  (loop [board [1 2 3 4 5 6 7 8 9]
          player :X]
     (print-board board)
     (let [new_board (play-one-turn board player)]
       (cond
-        (board-is-winning? new_board player) (do
-                                               (print-board new_board)
-                                               (println "> Player" (name player) "won"))
+        (board-is-winning? new_board) (do
+                                        (print-board new_board)
+                                        (println "> Player" (name player) "won"))
         (board-is-complete? new_board) (do
                                          (print-board new_board)
                                          (println "> Board is complete without winner"))
