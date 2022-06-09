@@ -80,11 +80,6 @@
   (= (count our_m)
      (count (set (concat our_m win_m)))))
 
-(defn board-is-complete?
-  "Return true if there is no more moves."
-  [board]
-  (every? string? board))
-
 (defn board-is-winning?
   "Return true if the board is winning.
    It is winning if X or O are like:
@@ -109,25 +104,18 @@
   So we win if our moves is part of ones of this 8 winning values.
   "
   [board player]
-  (let [win1 '(1 2 3)
-        win2 '(4 5 6)
-        win3 '(7 8 9)
-        win4 '(1 4 7)
-        win5 '(2 5 8)
-        win6 '(3 6 9)
-        win7 '(1 5 9)
-        win8 '(3 5 7)
+  (let [win_moves '((1 2 3) (4 5 6) (7 8 9)
+                    (1 4 7) (2 5 8) (3 6 9)
+                    (1 5 9) (3 5 7))
         moves (extract-moves board player)]
-   (or
-     (contains-winning-moves? moves win1)
-     (contains-winning-moves? moves win2)
-     (contains-winning-moves? moves win3)
-     (contains-winning-moves? moves win4)
-     (contains-winning-moves? moves win5)
-     (contains-winning-moves? moves win6)
-     (contains-winning-moves? moves win7)
-     (contains-winning-moves? moves win8))))
+   (some #(contains-winning-moves? moves %) win_moves)))
 
+(defn board-is-complete?
+  "Return true if there is no more moves."
+  [board]
+  (every? string? board))
+
+; ---------------------------
 ; Main loop
 (defn game-loop
   []
